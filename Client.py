@@ -6,6 +6,7 @@ import Instructions
 import pickle
 import traceback
 import PygameTerminal as pt
+import zlib
 
 attemptIpList = [
     ["192.168.1.63", Network.PORT],#Main Pc
@@ -29,6 +30,7 @@ ConnectToServer()
 
 func = None
 dataBuffer = None
+compress = False
 
 def Start():
     global dataBuffer
@@ -41,8 +43,6 @@ def Start():
         result = func(argList)
     except Exception as e:
         result = Instructions.ERROR + "| "  + traceback.format_exc()
-    if type(result) != bytearray and type(result) != bytes:
-        raise Exception("Function cannot return non byte object")
     pt.Print("Sending results")
     soc.send(Instructions.GOT_DATA)
     dataBuffer = result
@@ -55,8 +55,16 @@ def SetFunction():
     exec(functionSourceCode, namespace)
     func = namespace[functionName]
 def GetData():
-    soc.send(dataBuffer)
+    byteList = pickle.dumps(dataBuffer)
+    if compress:
+        byteList = zlib.compress(byteList)
+    soc.send(byteList)
+def SetCompression():
+    global compress
+    v = soc.recive(str)
+    compress = True if v == Instructions.TRUE else False
 def ExecInstruction():
+    global compress
     soc.SetTimeOut(None)
     instruction = soc.recive(str)
     soc.SetTimeOut()
@@ -66,6 +74,8 @@ def ExecInstruction():
         Start()
     elif instruction == Instructions.GET_DATA:
         GetData()
+    elif instruction == Instructions.SET_COMPRESSION:
+        SetCompression()
     else:
         raise Exception("Failed invlaid insturciton -> " + instruction)
 

@@ -15,6 +15,7 @@ while not ex:
     for i in Server.clientList:
         if i.new:
             i.SetFunction(Function.func)
+            i.SetCompression(True)
             i.new = False
             ex = True
 Server.clientList[0].Start(inp)

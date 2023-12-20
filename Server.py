@@ -4,6 +4,7 @@ import Instructions
 #import platform
 #import os
 import inspect
+import zlib
 
 soc = Network.Server()
 soc.setListen(10000)
@@ -19,6 +20,7 @@ class Client():
         self.networkClient = None
         self.gotData = False
         self.data = None
+        self.compression = False
     def SetFunction(self, func):
         functionName = func.__name__
         functionSourceCode = inspect.getsource(func)
@@ -30,6 +32,10 @@ class Client():
         self.networkClient.send(len(argList))
         for i in argList:
             self.networkClient.send(pickle.dumps(i))
+    def SetCompression(self, TorF):
+        self.networkClient.send(Instructions.SET_COMPRESSION)
+        self.networkClient.send(Instructions.TRUE if TorF else Instructions.FALSE)
+        self.compression = TorF
     def GetData(self):
         while 1:
             gotDataMsg = self.networkClient.recive(str)
@@ -37,6 +43,8 @@ class Client():
                 break
         self.networkClient.send(Instructions.GET_DATA)
         recivedBytes = self.networkClient.recive()
+        if self.compression:
+            recivedBytes = zlib.decompress(recivedBytes)
         data = pickle.loads(recivedBytes)
         return data     
 

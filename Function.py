@@ -75,7 +75,6 @@ def func(argList):
         out.append(pygame.surfarray.array3d(memory_surface))
         time.sleep(0.2)
     pygame.quit()
-    out = zlib.compress(pickle.dumps(out))
     return out
 
 if __name__ == "__main__":
