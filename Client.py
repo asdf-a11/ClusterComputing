@@ -55,7 +55,9 @@ def SetFunction():
 def GetData():
     soc.send(pickle.dumps(dataBuffer))
 def ExecInstruction():
+    soc.SetTimeOut(None)
     instruction = soc.recive(str)
+    soc.SetTimeOut()
     if instruction == Instructions.SEND_FUNCTION:
         SetFunction()
     elif instruction == Instructions.START:

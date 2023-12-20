@@ -4,7 +4,7 @@ import time
 import math
 CONFMSG = "Conf."
 PORT = 1500
-MAX_PER_PACKET = 1000#4095
+MAX_PER_PACKET = 4096
 def SelfIp():
     return socket.gethostbyname(socket.gethostname())
 class Client():
