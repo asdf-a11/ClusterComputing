@@ -41,6 +41,8 @@ def Start():
         result = func(argList)
     except Exception as e:
         result = Instructions.ERROR + "| "  + traceback.format_exc()
+    if type(result) != bytearray and type(result) != bytes:
+        raise Exception("Function cannot return non byte object")
     pt.Print("Sending results")
     soc.send(Instructions.GOT_DATA)
     dataBuffer = result

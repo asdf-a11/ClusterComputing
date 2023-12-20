@@ -4,7 +4,7 @@ import time
 import math
 CONFMSG = "Conf."
 PORT = 1500
-MAX_PER_PACKET = 4096
+MAX_PER_PACKET = 1000#4096
 def SelfIp():
     return socket.gethostbyname(socket.gethostname())
 class Client():
@@ -89,16 +89,17 @@ def sendProtocol(soc,item):
     byteList = item
     if type(item) == str:byteList = bytes(item, 'utf-8')
     if type(item) == int:byteList = item.to_bytes(8, byteorder='big')   
-    print("Sending Data Length -> ", len(byteList), " Data -> ", byteList) 
     soc.send(len(byteList).to_bytes(8, byteorder='big'))
     rem = len(byteList)
     while rem > 0:
-        print("Rem ", rem)
         packetSize = min(rem, MAX_PER_PACKET)
+        print("Rem ", rem, " Data ", byteList[:packetSize])
         soc.send(byteList[:packetSize])
         byteList = byteList[packetSize:]
         rem -= packetSize
+        print("Acc -> ", end = "")
         acc = bool(int.from_bytes(soc.recv(1), "big"))
+        print(acc)
         if acc == False:
             raise Exception("Msg not acc")
         
@@ -108,12 +109,11 @@ def reciveProtocol(soc,convert_type=None):
     rem = size
     data = []
     while rem > 0:
-        print("rem", rem)
         packetSize = min(rem, MAX_PER_PACKET)
         data.append(soc.recv(packetSize))
+        print("Rem", rem, " Data ", data[-1])
         rem -= packetSize
         soc.send((1).to_bytes(1,"big"))
-    print("Data", data)
     b = b"".join(data)
     print("Recived Length ", len(b))
     if convert_type == str:
