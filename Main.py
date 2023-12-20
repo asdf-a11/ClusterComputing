@@ -23,12 +23,14 @@ imgList = Server.clientList[0].GetData()
 
 import pygame, time
 pygame.init()   
-sx,sy = 400,400
+sx,sy = 100,100
 window = pygame.display.set_mode((sx,sy))
 while 1:
     for i in imgList:
+        print(i.shape)
         pygame.event.pump()
-        window.blit(pygame.surfarray.blit_array(i),(0,0))
+        pygame.surfarray.blit_array(window,i)
+        #window.blit(,(0,0))
         pygame.display.flip()
         time.sleep(0.1)
 

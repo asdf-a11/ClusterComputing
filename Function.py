@@ -70,9 +70,9 @@ def func(argList):
         for p in planetList:
             p.Draw()
         pygame.display.update()
-        memory_surface = pygame.Surface((sx,sy))
-        memory_surface.blit(window, (0, 0))
-        out.append(pygame.surfarray.array3d(memory_surface))
+        #memory_surface = pygame.Surface((sx,sy))
+        #memory_surface.blit(window, (0, 0))
+        out.append(pygame.surfarray.array2d(window))#pygame.surfarray.array3d(memory_surface)
         time.sleep(0.2)
     pygame.quit()
     return out
