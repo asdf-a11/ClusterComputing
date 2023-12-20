@@ -88,10 +88,12 @@ class Server():
 def sendProtocol(soc,item):
     byteList = item
     if type(item) == str:byteList = bytes(item, 'utf-8')
-    if type(item) == int:byteList = item.to_bytes(8, byteorder='big')    
+    if type(item) == int:byteList = item.to_bytes(8, byteorder='big')   
+    print("Sending Data Length -> ", len(byteList), " Data -> ", byteList) 
     soc.send(len(byteList).to_bytes(8, byteorder='big'))
     rem = len(byteList)
     while rem > 0:
+        print("Rem ", rem)
         packetSize = min(rem, MAX_PER_PACKET)
         soc.send(byteList[:packetSize])
         byteList = byteList[packetSize:]
