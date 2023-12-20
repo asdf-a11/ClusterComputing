@@ -38,7 +38,6 @@ class Client():
         self.networkClient.send(Instructions.GET_DATA)
         recivedBytes = self.networkClient.recive()
         data = pickle.loads(recivedBytes)
-        print("tesitng")
         return data     
 
 

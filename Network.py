@@ -96,6 +96,10 @@ def sendProtocol(soc,item):
         soc.send(byteList[:packetSize])
         byteList = byteList[packetSize:]
         rem -= packetSize
+        acc = bool(int.from_bytes(soc.recv(1), "big"))
+        if acc == False:
+            raise Exception("Msg not acc")
+        
 
 def reciveProtocol(soc,convert_type=None):
     size = int.from_bytes(soc.recv(8), "big") 
@@ -106,6 +110,7 @@ def reciveProtocol(soc,convert_type=None):
         packetSize = min(rem, MAX_PER_PACKET)
         data.append(soc.recv(packetSize))
         rem -= packetSize
+        soc.send((1).to_bytes(1,"big"))
     print("Data", data)
     b = b"".join(data)
     print("Recived Length ", len(b))
