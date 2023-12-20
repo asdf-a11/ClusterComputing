@@ -53,7 +53,7 @@ def SetFunction():
     exec(functionSourceCode, namespace)
     func = namespace[functionName]
 def GetData():
-    soc.send(pickle.dumps(dataBuffer))
+    soc.send(dataBuffer)
 def ExecInstruction():
     soc.SetTimeOut(None)
     instruction = soc.recive(str)
