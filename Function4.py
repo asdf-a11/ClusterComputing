@@ -100,12 +100,13 @@ def func(argList):
             g = Gas(d[0],d[1],d[2],d[3])
             gasList.append(g)
     def UpdateGas():
-        for gdx,g in enumerate(gasList):
+        for i in range(startGasIdx, endGasIdx):
+            g = gasList[i]
             g.Update()
-            if gdx % 100:
-                print(int(gdx/len(gasList) * 100), "%")
-        for g in gasList:
-            g.UpdatePos()
+            if i % 100:
+                print(int((i-startGasIdx)/endGasIdx * 100), "%")
+        for i in range(startGasIdx, endGasIdx):
+            gasList[i].UpdatePos()
     def PrintTotalVelocity():
         vx,vy = 0,0
         for g in gasList:
@@ -119,7 +120,8 @@ def func(argList):
     PrintTotalVelocity()
 
     out = []
-    for g in gasList:
+    for i in range(startGasIdx, endGasIdx):
+        g = gasList[i]
         out.append([g.posx,g.posy, g.vx,g.vy])
     return out
 

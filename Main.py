@@ -2,6 +2,7 @@ import Server
 import Function4 as Function
 
 import pygame
+import time
 
 sx,sy = 600,600
 dist = sx // 25
@@ -37,7 +38,9 @@ pygame.init()
 
 window = pygame.display.set_mode((sx,sy))
 
-def Draw():
+
+
+def Draw(frameCounter):
     pygame.event.pump()
     pygame.draw.rect(window,(0,0,0),(0,0,sx,sy))
     out = gasList
@@ -48,8 +51,9 @@ def Draw():
         b = 255
         pygame.draw.circle(window,(r,h,b),(g[0], g[1]), 3)
     pygame.display.flip()
+    pygame.image.save(window , str(frameCounter)+".png")
 
-for frameCounter in range(100):    
+for frameCounter in range(200):    
     while 1:
         Server.UpdateClientList()
         for i in Server.clientList:
@@ -59,18 +63,24 @@ for frameCounter in range(100):
                 i.new = False
         if len(Server.clientList) > 0:
             break
+    start = time.time()
     inp[-2] = 0    
-    for idx,i in enumerate(Server.clientList):
-        size = len(gasList) // len(Server.clientList)
+    size = len(gasList) // len(Server.clientList)
+    print("size, ", size)
+    for idx,i in enumerate(Server.clientList):        
         inp[-1] = inp[-2] + size
+        print("start ", inp[-2], " end ", inp[-1])
         i.Start(inp)
         inp[-2] += size
     newGasList = []
     for idx,i in enumerate(Server.clientList):
-        newGasList += i.GetData()
+        d = i.GetData()
+        if type(d) == str:
+            raise Exception(d)
+        newGasList += d
     gasList = newGasList
-    
-    Draw()
+    print("Time taken -> ", time.time() - start)
+    Draw(frameCounter)
 
 
 
