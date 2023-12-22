@@ -12,7 +12,7 @@ def func(argList):
     import pickle
     pygame.init()
     STEP = 10
-    sx,sy = 100,100
+    sx,sy = 200,200
     window = pygame.display.set_mode((sx,sy))
     it = argList[1]
     GRAV = 9.81
@@ -72,7 +72,7 @@ def func(argList):
         pygame.display.update()
         #memory_surface = pygame.Surface((sx,sy))
         #memory_surface.blit(window, (0, 0))
-        out.append(pygame.surfarray.array2d(window))#pygame.surfarray.array3d(memory_surface)
+        out.append(pygame.surfarray.array3d(window))#pygame.surfarray.array3d(memory_surface)
         time.sleep(0.2)
     pygame.quit()
     return out
@@ -80,14 +80,15 @@ def func(argList):
 if __name__ == "__main__":
     #x, y, mass, colour
     import random
-    inp = [[],10]
+    inp = [[],100]
     for i in range(200):
         c = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
-        inp[0].append([random.randint(0,100),random.randint(0,100), random.randint(5,400), c])
+        inp[0].append([random.randint(0,200),random.randint(0,200), random.randint(5,10), c])
     imgList = func(inp)
+    input()
     import pygame, time
     pygame.init()   
-    sx,sy = 400,400
+    sx,sy = 200,200
     window = pygame.display.set_mode((sx,sy))
     for i in imgList:
         pygame.event.pump()

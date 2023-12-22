@@ -1,13 +1,91 @@
 import Server
-import Function
+import Function4 as Function
+
+import pygame
+
+sx,sy = 600,600
+dist = sx // 25
+gasList = []
+def InitGasList():
+    x = 0
+    while x <= sx:
+        y = 0
+        while y <= sy:
+            gasList.append([x,y,0,0])
+            y += dist
+        x += dist
+    
+InitGasList()
+inp = [
+    sx,
+    sy,
+    3,
+    [[200,200, 30, 0, 10]],
+    20,
+    10,
+    1,
+    gasList,
+    0,
+    len(gasList)
+]
+
+clientList = []
+
+import pygame
+import math
+pygame.init()
+
+window = pygame.display.set_mode((sx,sy))
+
+def Draw():
+    pygame.event.pump()
+    pygame.draw.rect(window,(0,0,0),(0,0,sx,sy))
+    out = gasList
+    inp[7] = out
+    for g in out:
+        r = min(255, math.sqrt(g[2] ** 2 + g[3] ** 2) * 255)
+        h = 0
+        b = 255
+        pygame.draw.circle(window,(r,h,b),(g[0], g[1]), 3)
+    pygame.display.flip()
+
+for frameCounter in range(100):    
+    while 1:
+        Server.UpdateClientList()
+        for i in Server.clientList:
+            if i.new:
+                i.SetFunction(Function.func)
+                i.SetCompression(False)
+                i.new = False
+        if len(Server.clientList) > 0:
+            break
+    inp[-2] = 0    
+    for idx,i in enumerate(Server.clientList):
+        size = len(gasList) // len(Server.clientList)
+        inp[-1] = inp[-2] + size
+        i.Start(inp)
+        inp[-2] += size
+    newGasList = []
+    for idx,i in enumerate(Server.clientList):
+        newGasList += i.GetData()
+    gasList = newGasList
+    
+    Draw()
 
 
 
+
+
+
+
+
+
+'''
 import random
-inp = [[],1]
-for i in range(3):
+inp = [[],100]
+for i in range(200):
     c = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
-    inp[0].append([random.randint(0,400),random.randint(0,400), random.randint(5,400), c])
+    inp[0].append([random.randint(0,200),random.randint(0,200), random.randint(5,10), c])
 
 ex = False
 while not ex:
@@ -23,18 +101,21 @@ imgList = Server.clientList[0].GetData()
 
 import pygame, time
 pygame.init()   
-sx,sy = 100,100
+sx,sy = 200,200
 window = pygame.display.set_mode((sx,sy))
 while 1:
     for i in imgList:
         print(i.shape)
         pygame.event.pump()
-        pygame.surfarray.blit_array(window,i)
+        #pygame.surfarray.blit_array(window,i)
         #window.blit(,(0,0))
+        for x in range(sx):
+            for y in range(sy):
+                pygame.draw.rect(window,(i[x][y][0],i[x][y][1],i[x][y][2]),(x,y,1,1))
         pygame.display.flip()
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
-
+'''
 '''
 run = True
 DATA_SIZE = 5

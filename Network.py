@@ -93,13 +93,13 @@ def sendProtocol(soc,item):
     rem = len(byteList)
     while rem > 0:
         packetSize = min(rem, MAX_PER_PACKET)
-        print("Rem ", rem, " Data ", byteList[:packetSize])
+        #print("Rem ", rem, " Data ", byteList[:packetSize])
         soc.send(byteList[:packetSize])
         byteList = byteList[packetSize:]
         rem -= packetSize
-        print("Acc -> ", end = "")
+        #print("Acc -> ", end = "")
         acc = bool(int.from_bytes(soc.recv(1), "big"))
-        print(acc)
+        #print(acc)
         if acc == False:
             raise Exception("Msg not acc")
         
@@ -111,11 +111,11 @@ def reciveProtocol(soc,convert_type=None):
     while rem > 0:
         packetSize = min(rem, MAX_PER_PACKET)
         data.append(soc.recv(packetSize))
-        print("Rem", rem, " Data ", data[-1])
+        #print("Rem", rem, " Data ", data[-1])
         rem -= packetSize
         soc.send((1).to_bytes(1,"big"))
     b = b"".join(data)
-    print("Recived Length ", len(b))
+    #print("Recived Length ", len(b))
     if convert_type == str:
         b = b.decode("utf-8")
     if convert_type == int:
