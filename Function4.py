@@ -207,9 +207,10 @@ def Physics(argList):
                         #a = 1/(r + 0.5) 
                         #a = -log((r + 0.5)) + 1.5
                         aMag = max(0,-math.log10(r+0.5) * 5.3 +9.1)
+                        aMag /= 2
                         self.ax += aMag / r * distx
                         self.ay += aMag / r * disty
-                self.ay += 0.3
+                self.ay += 0.5
                 self.ax /= 2
                 self.ay /= 2
             def Update(self):
@@ -228,6 +229,8 @@ def Physics(argList):
                 self.oldPosy = self.posy
                 self.posx += self.vx / 5
                 self.posy += self.vy / 5
+                self.KeepInBoundsSquare()
+            def KeepInBoundsCircle(self):                
                 diffcx = -(self.posx - sx / 2)
                 diffcy = -(self.posy - sy / 2)
                 dist2 = diffcx ** 2 +  diffcy ** 2
@@ -241,18 +244,19 @@ def Physics(argList):
                     self.vy = self.vy - 2 * vDotn * ny
                     self.posx = self.oldPosx
                     self.posy = self.oldPosy
-                #if self.posx > sx:
-                #    self.posx = sx
-                #    self.vx *= -1
-                #if self.posx < 0:
-                #    self.posx = 0
-                #    self.vx *= -1
-                #if self.posy > sy:
-                #    self.posy = sy
-                #    self.vy *= -1
-                #if self.posy < 0:
-                #    self.posy = 0
-                #    self.vy *= -1
+            def KeepInBoundsSquare(self):                
+                if self.posx > sx:
+                    self.posx = sx
+                    self.vx *= -1
+                if self.posx < 0:
+                    self.posx = 0
+                    self.vx *= -1
+                if self.posy > sy:
+                    self.posy = sy
+                    self.vy *= -1
+                if self.posy < 0:
+                    self.posy = 0
+                    self.vy *= -1
 
         def LoadForces():
             for d in forceData:
@@ -266,7 +270,7 @@ def Physics(argList):
             for i in range(startGasIdx, endGasIdx):
                 g = gasList[i]
                 g.Update()
-                if i % 100:
+                if i % 100 == 0:
                     print(int((i-startGasIdx)/endGasIdx * 100), "%")
             for i in range(startGasIdx, endGasIdx):
                 gasList[i].UpdatePos()
@@ -280,7 +284,7 @@ def Physics(argList):
         LoadGasData()
 
         UpdateGas()
-        PrintTotalVelocity()
+        #PrintTotalVelocity()
 
         out = []
         for i in range(startGasIdx, endGasIdx):
@@ -293,6 +297,26 @@ def Physics(argList):
 
 
 if __name__ == "__main__":
+    '''
+    import time
+    start = time.time()
+    counter = 1
+    while time.time() - start < 0.25:
+        num = counter
+        while(num != 1):
+            if((num%2)==0):
+                num = num // 2 
+            else:
+                num = (num*3) + 1
+        counter += 1
+    print(counter)
+    '''
+    
+
+
+
+
+
     sx,sy = 600,600
     dist = sx // (25)
     gasList = []
@@ -344,7 +368,7 @@ if __name__ == "__main__":
         out = Physics(inp)
         inp[7] = out
         for g in out:
-            r = min(255, math.sqrt(g[2] ** 2 + g[3] ** 2) * 255)
+            r = min(255, math.sqrt(g[2] ** 2 + g[3] ** 2) * 30)
             h = 0
             b = 255
             pygame.draw.circle(window,(r,h,b),(g[0], g[1]), 3)

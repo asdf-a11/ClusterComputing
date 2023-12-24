@@ -5,6 +5,7 @@ import Instructions
 #import os
 import inspect
 import zlib
+import time
 
 soc = Network.Server()
 soc.setListen(10000)
@@ -12,6 +13,19 @@ soc.setListen(10000)
 #PYTHON_NAME = "python"
 #if platform.system() == "Linux":
 #    PYTHON_NAME = "python3"
+
+def TimeFunction(argList):
+    start = time.time()
+    counter = 1
+    while time.time() - start < 0.25:
+        num = counter
+        while(num != 1):
+            if((num%2)==0):
+                num = num // 2 
+            else:
+                num = (num*3) + 1
+        counter += 1
+    return [counter]
 
 class Client():
     def __init__(self):
@@ -22,6 +36,15 @@ class Client():
         self.data = None
         self.compressionReturn = False
         self.compressArgs = False
+        self.taskStartTime = None
+        self.taskEndTime = None
+        self.taskDuration = None
+        self.flops = None
+    def MeasureProcSpeed(self):
+        self.SetFunction(TimeFunction)
+        self.Start([])
+        self.flops = self.GetData()[0]
+        print("Client flop count = ", self.flops)
     def SetFunction(self, func):
         functionName = func.__name__
         functionSourceCode = inspect.getsource(func)
@@ -29,12 +52,13 @@ class Client():
         self.networkClient.send(functionName)
         self.networkClient.send(functionSourceCode)
     def Start(self, argList):
+        self.taskStartTime = time.time()
         self.networkClient.send(Instructions.START)
         assert type(argList) == list
         argListBytes = pickle.dumps(argList)
         if self.compressArgs:
             argListBytes = zlib.compress(argListBytes)
-        self.networkClient.send(argListBytes)
+        self.networkClient.send(argListBytes)        
     def SetCompressionArgs(self, TorF):
         self.networkClient.send(Instructions.SET_COMPRESSION_ARGS)
         self.networkClient.send(Instructions.TRUE if TorF else Instructions.FALSE)
@@ -53,6 +77,8 @@ class Client():
         if self.compression:
             recivedBytes = zlib.decompress(recivedBytes)
         data = pickle.loads(recivedBytes)
+        self.taskEndTime = time.time()
+        self.taskDuration = self.taskEndTime - self.taskStartTime
         return data     
 
 
@@ -64,6 +90,7 @@ def UpdateClientList():
             i.new = False
             c = Client()
             c.networkClient = i
+            c.MeasureProcSpeed()
             clientList.append(c)
 
 
