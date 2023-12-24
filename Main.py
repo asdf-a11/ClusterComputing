@@ -5,14 +5,15 @@ import pygame
 import time
 
 sx,sy = 600,600
-dist = sx // 25
+dist = sx // (25 * 2)
 gasList = []
 def InitGasList():
     x = 0
     while x <= sx:
         y = 0
         while y <= sy:
-            gasList.append([x,y,0,0])
+            if (x - 300) ** 2 + (y - 300) ** 2 < 300 ** 2:
+                gasList.append([x,y,0,0])
             y += dist
         x += dist
     
@@ -20,8 +21,8 @@ InitGasList()
 inp = [
     sx,
     sy,
-    3,
-    [[200,200, 30, 0, 10]],
+    2,
+    [],#[200,200, 30, 0, 10]
     20,
     10,
     1,
@@ -51,14 +52,14 @@ def Draw(frameCounter):
         b = 255
         pygame.draw.circle(window,(r,h,b),(g[0], g[1]), 3)
     pygame.display.flip()
-    pygame.image.save(window , str(frameCounter)+".png")
+    pygame.image.save(window , "out2\\" + str(frameCounter)+".png")
 
-for frameCounter in range(200):    
+for frameCounter in range(400):    
     while 1:
         Server.UpdateClientList()
         for i in Server.clientList:
             if i.new:
-                i.SetFunction(Function.func)
+                i.SetFunction(Function.Physics)
                 i.SetCompression(False)
                 i.new = False
         if len(Server.clientList) > 0:
@@ -66,9 +67,12 @@ for frameCounter in range(200):
     start = time.time()
     inp[-2] = 0    
     size = len(gasList) // len(Server.clientList)
+    rem = len(gasList) - size * len(Server.clientList)
     print("size, ", size)
     for idx,i in enumerate(Server.clientList):        
         inp[-1] = inp[-2] + size
+        if idx == len(Server.clientList) - 1:
+            inp[-1] += rem
         print("start ", inp[-2], " end ", inp[-1])
         i.Start(inp)
         inp[-2] += size

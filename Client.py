@@ -30,19 +30,21 @@ ConnectToServer()
 
 func = None
 dataBuffer = None
-compress = False
+compressReturn = False
+compressArgs = False
 
 def Start():
     global dataBuffer
     pt.Print("Starting")
-    argList = []
-    argCount = soc.recive(int)    
-    for i in range(argCount):
-        argList.append(pickle.loads(soc.recive()))
+    argBytes = soc.recive()
+    if compressArgs:
+        argBytes = zlib.decompress(argBytes)
+    argList = pickle.loads(argBytes)
     try:
         result = func(argList)
     except Exception as e:
         result = Instructions.ERROR + "| "  + traceback.format_exc()
+        print("Error -> " + result)
     pt.Print("Sending results")
     soc.send(Instructions.GOT_DATA)
     dataBuffer = result
@@ -59,10 +61,14 @@ def GetData():
     if compress:
         byteList = zlib.compress(byteList)
     soc.send(byteList)
-def SetCompression():
-    global compress
+def SetCompressionReturn():
+    global compressReturn
     v = soc.recive(str)
-    compress = True if v == Instructions.TRUE else False
+    compressReturn = True if v == Instructions.TRUE else False
+def SetCompressionArgs():
+    global compressArgs
+    v = soc.recive(str)
+    compressArgs = True if v == Instructions.TRUE else False
 def ExecInstruction():
     global compress
     soc.SetTimeOut(None)
@@ -74,8 +80,10 @@ def ExecInstruction():
         Start()
     elif instruction == Instructions.GET_DATA:
         GetData()
-    elif instruction == Instructions.SET_COMPRESSION:
-        SetCompression()
+    elif instruction == Instructions.SET_COMPRESSION_RETURN:
+        SetCompressionReturn()
+    elif instruction == Instructions.SET_COMPRESSION_ARGS:
+        SetCompressionArgs()
     else:
         raise Exception("Failed invlaid insturciton -> " + instruction)
 

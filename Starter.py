@@ -2,11 +2,12 @@ import multiprocessing
 import os
 
 def Task():
-    os.system("python3 Client.py")
+    os.system("python Client.py")
 
 if __name__ == "__main__":
     pList = []
-    for i in range(multiprocessing.cpu_count()):
+    to = multiprocessing.cpu_count()
+    for i in range(to):
         p = multiprocessing.Process(target=Task)
         p.start()
         pList.append(p)

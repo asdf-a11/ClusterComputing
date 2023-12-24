@@ -20,7 +20,8 @@ class Client():
         self.networkClient = None
         self.gotData = False
         self.data = None
-        self.compression = False
+        self.compressionReturn = False
+        self.compressArgs = False
     def SetFunction(self, func):
         functionName = func.__name__
         functionSourceCode = inspect.getsource(func)
@@ -29,13 +30,19 @@ class Client():
         self.networkClient.send(functionSourceCode)
     def Start(self, argList):
         self.networkClient.send(Instructions.START)
-        self.networkClient.send(len(argList))
-        for i in argList:
-            self.networkClient.send(pickle.dumps(i))
-    def SetCompression(self, TorF):
-        self.networkClient.send(Instructions.SET_COMPRESSION)
+        assert type(argList) == list
+        argListBytes = pickle.dumps(argList)
+        if self.compressArgs:
+            argListBytes = zlib.compress(argListBytes)
+        self.networkClient.send(argListBytes)
+    def SetCompressionArgs(self, TorF):
+        self.networkClient.send(Instructions.SET_COMPRESSION_ARGS)
         self.networkClient.send(Instructions.TRUE if TorF else Instructions.FALSE)
-        self.compression = TorF
+        self.compressionArgs = TorF
+    def SetCompressionReturn(self, TorF):
+        self.networkClient.send(Instructions.SET_COMPRESSION_RETURN)
+        self.networkClient.send(Instructions.TRUE if TorF else Instructions.FALSE)
+        self.compressionReturn = TorF
     def GetData(self):
         while 1:
             gotDataMsg = self.networkClient.recive(str)

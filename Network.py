@@ -8,7 +8,7 @@ MAX_PER_PACKET = 1000#4096
 def SelfIp():
     return socket.gethostbyname(socket.gethostname())
 class Client():
-    def SetTimeOut(self, seconds=5):
+    def SetTimeOut(self, seconds=10):
         self.soc.settimeout(seconds)
     def __init__(self,ip,port):
         self.ip = ip
@@ -107,6 +107,8 @@ def sendProtocol(soc,item):
 def reciveProtocol(soc,convert_type=None):
     size = int.from_bytes(soc.recv(8), "big") 
     rem = size
+    if rem > MAX_PER_PACKET:
+        print("Size = ", rem)
     data = []
     while rem > 0:
         packetSize = min(rem, MAX_PER_PACKET)
