@@ -15,6 +15,7 @@ soc.setListen(10000)
 #    PYTHON_NAME = "python3"
 
 def TimeFunction(argList):
+    import time
     start = time.time()
     counter = 1
     while time.time() - start < 0.25:
@@ -74,7 +75,7 @@ class Client():
                 break
         self.networkClient.send(Instructions.GET_DATA)
         recivedBytes = self.networkClient.recive()
-        if self.compression:
+        if self.compressionReturn:
             recivedBytes = zlib.decompress(recivedBytes)
         data = pickle.loads(recivedBytes)
         self.taskEndTime = time.time()

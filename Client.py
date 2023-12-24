@@ -58,7 +58,7 @@ def SetFunction():
     func = namespace[functionName]
 def GetData():
     byteList = pickle.dumps(dataBuffer)
-    if compress:
+    if compressReturn:
         byteList = zlib.compress(byteList)
     soc.send(byteList)
 def SetCompressionReturn():
